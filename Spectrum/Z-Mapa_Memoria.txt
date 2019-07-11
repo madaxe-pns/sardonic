@@ -1,0 +1,39 @@
+CARREGADOR:
+
+24900 - 24911 : carregador.tap - copia o loading screen da memória para o écran
+
+45000 - 51911 : screen_loading.tap - loading screen
+
+---------------------------------------------------------------------
+
+JOGO:
+
+25000 - 26094 : spr_01.tap - gráficos: nave, inimigos e tiros
+
+26100 - 27420 : spr_02.tap - gráficos: bosses, prémios e explosões
+
+27500 - 28076 : spr_03.tap - gráficos: título, bombas, vidas e níveis
+
+28100 - 29444 : spr_04.tap - gráficos: painel
+
+29500 - 30267 : spr_05.tap - fonte dos caracteres
+
+32000 - 32999 : inimigos.tap - tipo dos inimigos
+
+33000 - 33999 : inimigos_x_01.tap - posição horizontal dos inimigos 01
+
+34000 - 34999 : inimigos_x_02.tap - posição horizontal dos inimigos 02
+
+35000 - 35999 : inimigos_x_03.tap - posição horizontal dos inimigos 03
+
+36000 - 36999 : inimigos_x_04.tap - posição horizontal dos inimigos 04
+
+37500 - 37939 : mus_02-dados.tap - dados da música
+
+38000 - 44842 : mus_01-notas.tap - música
+
+45000 - 51911 : screen_final.tap - écran final
+
+52000 - 63564 : mSPR_2.TAP - código
+
+Total : 38564 Bytes
