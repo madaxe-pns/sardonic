@@ -1,6 +1,8 @@
 # Sardonic
 Sources of the legendary shoot'm'up Sardonic.
 
+More info: http://sardonic.planetaclix.pt
+
 ### Amiga
 Commodore Amiga OCS/ECS and AGA sources.
 
