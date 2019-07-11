@@ -1,0 +1,105 @@
+Todas as cores são multiplicadas por 16 em relação ao OCS/ECS (0-255)
+
+------------------------------------------------
+
+Palette AGA
+
+0-15  : Foreground - Naves inimigas, tiros e prémios (shapes)
+16-31 : Background - starfield, explosão, planeta e saturno (plots e shapes)
+32-35 : Nave (sprite)
+36-47 : Título (shape)
+48-53 : Fonte (shapes)
+
+------------------------------------------------
+
+Sprite : 32-35
+
+Nave - 	0,0,0	    : Transparente    - Index 32
+	224,224,128 : Amarelo	      - Index 33
+	0,0,192	    : Azul Escuro     - Index 34
+	128,32,0    : Vermelho Escuro - Index 35
+
+------------------------------------------------
+
+Foreground : 0-15
+
+Transparente - 0,0,0 : Preto - Index 0
+
+Ini,Boss 1 - 32,160,192	 : Azul Claro  - Index 4
+	     0,0,192 	 : Azul Escuro - Index 3
+	     224,224,128 : Amarelo     - Index 6
+	     255,255,255 : Branco      - Index 2
+
+Ini,Boss 2 - 64,160,0 	 : Verde Claro  - Index 5
+	     0,0,192 	 : Azul Escuro  - Index 3
+	     224,224,128 : Amarelo      - Index 6
+	     255,255,255 : Branco 	- Index 2
+
+Ini,Boss 3 - 0,0,192 	 : Azul Escuro - Index 3
+	     192,192,192 : Cinzento    - Index 8
+	     255,255,255 : Branco      - Index 2
+
+Ini,Boss 4 - 192,32,0	 : Vermelho 	   - Index 1
+	     128,32,0 	 : Vermelho Escuro - Index 7
+	     0,0,192 	 : Azul Escuro     - Index 3
+	     255,255,255 : Branco 	   - Index 2
+
+Boss 5	   - 64,64,192   : Roxo	       - Index 9
+	   - 0,0,192	 : Azul Escuro - Index 3
+	   - 255,255,255 : Branco      - Index 1
+
+Tiro	   - 255,255,255 : Branco  - Index 2
+Tiro Ini   - 224,224,128 : Amarelo - Index 6
+
+Vidas - 0,192,128   - Index 10
+Tiros - 0,192,192   - Index 11
+Bomba - 224,128,192 - Index 12
+Pontos- 128,128,192 - Index 13
+
+Não usado - Index 14
+Não usado - Index 15
+
+------------------------------------------------
+
+Background: 16-31
+
+Preto : 0,0,0 - Index 16
+
+Explosão - 128,32,0    - Index 17
+ 	   160,64,0    - Index 18
+	   160,96,0    - Index 19
+	   192,128,0   - Index 20
+	   224,192,0   - Index 21
+	   224,224,128 - Index 22
+
+StarField - Index 23 - Index 30
+
+Saturno -  32,160,192 : Azul Claro - Index 26
+
+Planeta	-  64,160,0 : Verde Claro - Index 31
+
+------------------------------------------------
+
+Resto: 36-63
+
+Título - 176,176,192 - Index 36
+	 160,160,192 - Index 37
+	 144,144,192 - Index 38
+	 128,128,192 - Index 39
+	 112,112,192 - Index 40
+	 96,96,192   - Index 41
+	 80,80,192   - Index 42
+	 64,64,192   - Index 43
+	 48,48,192   - Index 44
+	 32,32,192   - Index 45
+	 16,16,192   - Index 46
+	 0,0,192     - Index 47
+	 	 
+Fonte -	112,112,112 - Index 48
+	128,128,128 - Index 49
+	144,144,144 - Index 50
+	192,192,192 - Index 51
+ 	208,208,208 - Index 52
+	224,224,224 - Index 53
+
+Não usado - Index 54 - Index 63

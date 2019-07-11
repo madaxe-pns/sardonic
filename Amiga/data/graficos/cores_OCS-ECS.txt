@@ -1,0 +1,85 @@
+------------------------------------------------
+
+Palette OCS/ECS
+
+0-7   : Foreground - Naves inimigas, tiros e prémios (shapes)
+8-15  : Background - starfield, explosão, planeta e saturno (plots e shapes)
+16-19 : Nave (sprite)
+20-25 : Título (shape)
+26-31 : Fonte (shapes)
+
+------------------------------------------------
+
+Sprite: 16-19
+
+Nave - 	0,0,0	: Transparente    - Index 16
+	14,14,8 : Amarelo	  - Index 17
+	0,0,12	: Azul Escuro	  - Index 18
+	8,2,0	: Vermelho Escuro - Index 19
+
+------------------------------------------------
+
+Foreground: 0-7
+
+Transparente - 0,0,0  : Preto - Index 0
+
+Ini,Boss 1 - 2,10,12  : Azul Claro  - Index 4
+	     0,0,12   : Azul Escuro - Index 3
+	     15,15,15 : Branco	    - Index 2
+
+Ini,Boss 2 - 4,10,0   : Verde Claro - Index 5
+	     0,0,12   : Azul Escuro - Index 3
+	     15,15,15 : Branco	    - Index 2
+
+Ini,Boss 3 - 0,0,12   : Azul Escuro - Index 3
+	     12,12,12 : Cinzento    - Index 6
+	     15,15,15 : Branco 	    - Index 2
+
+Ini,Boss 4 - 12,2,0   : Vermelho    - Index 1
+	     0,0,12   : Azul Escuro - Index 3
+	     15,15,15 : Branco      - Index 2
+
+Boss 5	   - 4,4,12   : Roxo  	    - Index 7
+	   - 0,0,12   : Azul Escuro - Index 3
+	   - 15,15,15 : Branco 	    - Index 2
+
+Tiro	   - 15,15,15 : Branco   - Index 2
+Tiro Ini   - 12,12,12 : Cinzento - Index 6
+
+Vidas - 4,10,0  : Verde Claro - Index 5
+Tiros - 2,10,12 : Azul Claro  - Index 4
+Bomba - 12,2,0  : Vermelho    - Index 1
+Pontos- 4,4,12  : Roxo        - Index 7
+
+------------------------------------------------
+
+Background: 8-15
+
+Preto: 0,0,0 - Index 8
+
+Estrelas - Index 9 - Index 14
+
+Saturno	 - 2,10,12 : Azul Claro - Index 12
+
+Explosão - 12,6,0  : Castanho - Index 13 
+	 - 14,14,8 : Amarelo  - Index 14
+
+Planeta	-  4,10,0 : Verde Claro - Index 15
+
+------------------------------------------------
+
+Resto: 20-31
+
+Título - 10,10,12 - Index 20
+	 8,8,12   - Index 21
+	 6,6,12   - Index 22
+	 4,4,12   - Index 23
+	 2,2,12   - Index 24
+	 0,0,12   - Index 25
+
+Fonte -	7,7,7	  - Index 26
+	8,8,8	  - Index 27
+	9,9,9	  - Index 28
+	12,12,12  - Index 29
+	13,13,13  - Index 30
+	14,14,14  - Index 31
