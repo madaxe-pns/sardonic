@@ -1,6 +1,10 @@
 # Sardonic
 Sources of the legendary shoot'm'up Sardonic.
 
+Code & Graphics by MadAxe.
+
+Music by Fred.
+
 More info: http://sardonic.planetaclix.pt
 
 ### Amiga
