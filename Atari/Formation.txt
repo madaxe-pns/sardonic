@@ -1,0 +1,66 @@
+Formation Paths: 46: 0-45
+-------------------------
+
+ 0 - Sem Inimigos
+
+ 1 - Vertical
+ 2 - Vertical Sinusoidal Direita
+ 3 - Vertical Circular Direita
+ 4 - Vertical Sinusoidal Esquerda
+ 5 - Vertical Circular Esquerda
+
+ 6 - Circular Direita	- Não funcionam sozinhos e só
+ 7 - Circular Esquerda	- são usados com Inimigos Médios
+
+ 8 - Horizontal Direita			
+ 9 - Horizontal Direita Sinusoidal Baixo
+10 - Horizontal Direita Circular Baixo	
+11 - Horizontal Direita Sinusoidal Cima	
+12 - Horizontal Direita Circular Cima	
+
+13 - Horizontal Esquerda
+14 - Horizontal Esquerda Sinusoidal Baixo
+15 - Horizontal Esquerda Circular Baixo
+16 - Horizontal Esquerda Sinusoidal Cima
+17 - Horizontal Esquerda Circular Cima
+
+18 - Diagonal Direita Baixo	
+19 - Diagonal Direita Cima	
+20 - Diagonal Esquerda Baixo
+21 - Diagonal Esquerda Cima
+
+22 - Sinusoidal Direita  - Não funcionam sozinhos e só
+23 - Sinusoidal Esquerda - são usados com Bosses	
+
+24 - Vertical mais Circular Direita 	
+25 - Vertical mais Circular Esquerda	
+
+26 - Vertical mais Sinusoidal Direita
+27 - Vertical mais Sinusoidal Esquerda
+
+28 - Vertical mais Vertical Sinusoidal Direita
+29 - Vertical mais Vertical Sinusoidal Esquerda
+
+30 - Vertical mais Diagonal Direita
+31 - Vertical mais Diagonal Esquerda
+
+32 - Vertical mais Vertical Circular Direita
+33 - Vertical mais Vertical Circular Esquerda
+
+34 - Horizontal Direita mais Diagonal Cima
+35 - Horizontal Direita mais Diagonal Baixo
+
+36 - Horizontal Direita mais Horizontal Circular Cima
+37 - Horizontal Direita mais Horizontal Circular Baixo
+
+38 - Horizontal Esquerda mais Diagonal Cima
+39 - Horizontal Esquerda mais Diagonal Baixo
+
+40 - Horizontal Esquerda mais Horizontal Circular Cima
+41 - Horizontal Esquerda mais Horizontal Circular Baixo
+
+42 - Diagonal Direita Baixo mais Diagonal Direita Cima
+43 - Diagonal Esquerda Baixo mais Diagonal Esquerda Cima
+
+44 - Diagonal Direita Baixo mais Vertical
+45 - Diagonal Esquerda Baixo mais Vertical

@@ -1,0 +1,45 @@
+x,y - tx,ty
+
+Fórmula : (320*y+x)/4
+
+Nave 1 - 0,32 - 16,16
+Nave 2 - 16,32 - 16,16
+
+Fighter I  -  0,0 - 15,16
+Fighter II - 16,0 - 16,15
+Stealth    - 32,0 - 15,24
+Bomber     - 48,0 - 15,23
+
+Scout 1 - 112,32  - 12,12
+Scout 2 - 128,32  - 12,12
+Scout 3 - 144,32 - 12,12
+Scout 4 - 160,32 - 12,12
+Scout 5 - 176,32 - 12,12
+Scout 6 - 192,32 - 12,12
+
+Tiro Inimigo 1 - 0,80  -  1,8
+Tiro Inimigo 2 - 16,80 -  9,8
+Tiro Nave 1    - 32,80 -  1,8
+Tiro Nave 2    - 48,80 - 10,8
+
+Explosão 1 - 0,48 - 16,16
+Explosão 2 - 16,48 - 16,16
+Explosão 3 - 32,48 - 16,16
+Explosão 4 - 48,48 - 16,16
+
+Vidas  - 32,32 - 10,11
+Tiros  - 48,32 - 10,11
+Bombas - 64,32 - 10,11
+Pontos - 80,32 - 10,11
+Inven  - 96,32 - 10,11
+Speed  - 64,48 - 10,11
+
+Boss 1 - 112,0 - 46,32 - Middle X : 147
+Boss 2 - 160,0 - 46,32 - Middle X : 147
+Boss 3 - 208,0 - 30,48 - Middle X : 139
+Boss 4 - 80,48 - 30,46 - Middle X : 139
+Boss 5 - 0,96  - 64,30 - Middle X : 156
+
+Título - 0,128 - 189,18
+
+Painel - 240,0 - 79,200
