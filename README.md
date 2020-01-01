@@ -7,11 +7,11 @@ Music by Fred.
 
 More info: http://sardonic.planetaclix.pt
 
-### Atari
-Atari sources.
-
 ### Amiga
 Commodore Amiga OCS/ECS and AGA sources.
+
+### Atari
+Atari sources.
 
 ### PC_Windows
 PC Windows sources.
