@@ -5,6 +5,8 @@ Code & Graphics by MadAxe.
 
 Music by Fred.
 
+Linux port by Thorsten Otto
+
 More info: http://sardonic.planetaclix.pt
 
 ### Amiga
