@@ -3,7 +3,7 @@ Sources of the legendary shoot'm'up Sardonic.
 
 Code & Graphics by MadAxe.
 
-Music by Fred.
+Music by Frédéric Hahn.
 
 Linux port by Thorsten Otto
 
