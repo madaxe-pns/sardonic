@@ -19,7 +19,7 @@ Atari sources.
 Lunix sources.
 
 ### MS-DOS
-Atari sources.
+MS-DOS sources.
 
 ### PC_Windows
 PC Windows sources.
