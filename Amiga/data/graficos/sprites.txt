@@ -10,7 +10,10 @@ Bomber - 0,0 - 24,24
 Tiro Inimigo - 0,67 - 1,8
 Tiro - 2,67 - 1,8
 
-Explosão - 0,40 - 24,24
+Explosão 1 - 0,40 - 16,16
+Explosão 2 - 16,40 - 16,16
+Explosão 3 - 32,40 - 16,16
+Explosão 4 - 48,40 - 16,16
 
 Vidas - 30,63 - 12,12
 Tiros - 42,63 - 12,12

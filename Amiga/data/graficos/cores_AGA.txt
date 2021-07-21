@@ -4,8 +4,8 @@ Todas as cores são multiplicadas por 16 em relação ao OCS/ECS (0-255)
 
 Palette AGA
 
-0-15  : Foreground - Naves inimigas, tiros e prémios (shapes)
-16-31 : Background - starfield, explosão, planeta e saturno (plots e shapes)
+0-15  : Foreground - Naves inimigas, tiros, explosões e prémios (shapes)
+16-31 : Background - starfield, planeta e saturno (plots e shapes)
 32-35 : Nave (sprite)
 36-47 : Título (shape)
 48-53 : Fonte (shapes)
@@ -56,6 +56,9 @@ Tiros - 0,192,192   - Index 11
 Bomba - 224,128,192 - Index 12
 Pontos- 128,128,192 - Index 13
 
+Explosão - 192,32,0  	: Vermelho - Index 1
+	   224,224,128 	: Amarelo  - Index 6
+
 Não usado - Index 14
 Não usado - Index 15
 
@@ -65,14 +68,7 @@ Background: 16-31
 
 Preto : 0,0,0 - Index 16
 
-Explosão - 128,32,0    - Index 17
- 	   160,64,0    - Index 18
-	   160,96,0    - Index 19
-	   192,128,0   - Index 20
-	   224,192,0   - Index 21
-	   224,224,128 - Index 22
-
-StarField - Index 23 - Index 30
+StarField - Index 17 - Index 31
 
 Saturno -  32,160,192 : Azul Claro - Index 26
 

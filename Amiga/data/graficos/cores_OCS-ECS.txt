@@ -2,8 +2,8 @@
 
 Palette OCS/ECS
 
-0-7   : Foreground - Naves inimigas, tiros e prémios (shapes)
-8-15  : Background - starfield, explosão, planeta e saturno (plots e shapes)
+0-7   : Foreground - Naves inimigas, tiros, explosões e prémios (shapes)
+8-15  : Background - starfield, planeta e saturno (plots e shapes)
 16-19 : Nave (sprite)
 20-25 : Título (shape)
 26-31 : Fonte (shapes)
@@ -51,18 +51,18 @@ Tiros - 2,10,12 : Azul Claro  - Index 4
 Bomba - 12,2,0  : Vermelho    - Index 1
 Pontos- 4,4,12  : Roxo        - Index 7
 
+Explosão - 12,2,0   : Vermelho - Index 1
+	 - 12,12,12 : Cinzento - Index 6
+
 ------------------------------------------------
 
 Background: 8-15
 
 Preto: 0,0,0 - Index 8
 
-Estrelas - Index 9 - Index 14
+Estrelas - Index 9 - Index 15
 
 Saturno	 - 2,10,12 : Azul Claro - Index 12
-
-Explosão - 12,6,0  : Castanho - Index 13 
-	 - 14,14,8 : Amarelo  - Index 14
 
 Planeta	-  4,10,0 : Verde Claro - Index 15
 
