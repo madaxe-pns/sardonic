@@ -19,15 +19,6 @@ NPrint ""
 NPrint "AGA Version"
 NPrint ""
 
-; Verifica a Memoria Disponivel
-If ChipFree<600000
-  NPrint "Not enough memory. 1 MB is required"
-  NPrint ""
-  Goto fimfim
-Else
-  NPrint "Memory OK"
-End If
-
 ; Verifica se e PAL ou NTSC
 If NTSC
   NPrint ""
@@ -104,7 +95,6 @@ NEWTYPE .linis
 End NEWTYPE
 
 Dim List lini.linis(7)
-inicount=100
 
 ;Lista de Dados dos Inimigos
 NEWTYPE .ltinis
@@ -152,8 +142,6 @@ NEWTYPE .ltiros
 End NEWTYPE
 
 Dim List ltiro.ltiros(16)
-tirocount=25
-
 
 ; Disparos Inimigos
 NEWTYPE .ltirosini
@@ -162,9 +150,6 @@ NEWTYPE .ltirosini
 End NEWTYPE
 
 Dim List ltiroini.ltirosini(31)
-tiroinicount=50
-tiroinirate=50
-
 
 ; Premios
 NEWTYPE .lpremios
@@ -177,12 +162,12 @@ End NEWTYPE
 
 Dim List lpremio.lpremios(8)
 
-
 ; Explosoes
 NEWTYPE .lexplos
   x.w
   y.w
   cnt.w
+  fase.w
 End NEWTYPE
 
 Dim List lexplo.lexplos(16)
@@ -208,6 +193,8 @@ estado=9
 counter=0
 hiscore=0
 
+joytype=0
+
 ; Textos
 
 texto$=""
@@ -217,9 +204,7 @@ txty=0
 Queue 0,64    ; Queue do Foreground Bitmap - Double Buffer 0
 Queue 1,64    ; Queue do Foreground BitMap - Double Buffer 1
 
-Buffer 0,1024 ; Buffer do Background Bitmap - Planeta
-Buffer 1,2048 ; Buffer do Background Bitmap - Saturno
-Buffer 2,8192 ; Buffer do Background Bitmap - Explosoes
+Buffer 0,1024 ; Buffer do Background Bitmap - Saturno e Planeta
 
 BIT0 = 0 ; BitMap Foreground - Double Buffer : 0 ou 1
 
@@ -245,7 +230,7 @@ BIT0 = 0 ; BitMap Foreground - Double Buffer : 0 ou 1
 #CORES= 64 ; 64 Cores
 #BITPLANES = 4
 
-#CORMAX = 31 ; Index da Cor Maxima no Background BitMap
+#CORMAX = 15 ; Numero Maximo de Cores no Background BitMap
 
 #RGBMAX = 255 ; Valor maximo para o RGB
 #RGBMED = 127 ; Valor medio para o RGB
@@ -293,8 +278,23 @@ BIT0 = 0 ; BitMap Foreground - Double Buffer : 0 ou 1
 
 #CORRE = 2 ; Distancia entre os InitCopList do Jogo
 
-#COUNTERMAX = 4000 ; Tempo maximo para os Menus
+#COUNTERMAX = 750 ; Tempo maximo para os Menus
 
+#RATETIRO = 25 ; Intervalo de Tempo entre os Disparos da Nave
+
+#RATETIROINIPM = 35 ; Intervalo de Tempo entre os Disparos dos Inimigos
+#RATETIROINIBS = 25 ; Intervalo de Tempo entre os Disparos dos Bosses
+
+#RATEINI = 35 ; Intervalo de Tempo entre os Inimigos
+
+#TEMPOBOMBA = 50 ; Intervalo entre as Bombas
+
+#MAXVIDAS = 5  ; Numero Maximo de Vidas
+#MAXBOMBAS = 5 ; Numero Maximo de Bombas
+
+#ARMOUR = 100 ; Tempo da Invencibilidade
+
+#PRMTEMPO = 75 ; Tempo que os Premios ficam Disponiveis
 
 ; Ficheiro das Shapes
 
@@ -325,12 +325,15 @@ FileBIT$="data/graficos/spr_"+Str$(#CORES)+".lbm"
 #prbombas=14
 #prpontos=15
 
-#explosao=16
+#explosao1=16
+#explosao2=17
+#explosao3=18
+#explosao4=19
 
-#titulo=17
+#titulo=20
 
-#planeta=18
-#saturno=19
+#planeta=21
+#saturno=22
 
 ; Sons
 
@@ -346,17 +349,8 @@ FileBIT$="data/graficos/spr_"+Str$(#CORES)+".lbm"
 ; Inicializa os BitMaps, as Shapes e o Sprite
 .bitmshapes
 
-BitMap BIT0,320,336,#BITPLANES   ; BitMap Foreground - Double Buffer 0
-BitMap BIT0+1,320,336,#BITPLANES ; BitMap Foreground - Double Buffer 1
-
-BitMap #BIT1,320,768,#BITPLANES ; BitMap Background
-
-BitMap #BIT2,320,256,#BITPLANES ; BitMap Shapes
-
-BitMap #BIT3,320,256,#PROF     ; BitMap Menu
-
-BitMap #BIT4,320,16,#PROF      ; BitMap Painel
-
+; Cria o BitMap das Shapes
+BitMap #BIT2,320,175,#BITPLANES ; BitMap Shapes
 
 NPrint "Loading Graphics"
 
@@ -399,7 +393,10 @@ GetaShape #prtiros,42,63,12,12
 GetaShape #prbombas,54,63,12,12
 GetaShape #prpontos,66,63,12,12
 
-GetaShape #explosao,0,40,24,24
+GetaShape #explosao1,0,40,16,16
+GetaShape #explosao2,16,40,16,16
+GetaShape #explosao3,32,40,16,16
+GetaShape #explosao4,48,40,16,16
 
 GetaShape #planeta,0,150,24,24
 GetaShape #saturno,26,150,28,24
@@ -408,7 +405,7 @@ Free BitMap #BIT2
 
 ; Le de novo as Shapes mas desta vez com 64 Cores em AGA
 
-BitMap #BIT2,320,256,#PROF
+BitMap #BIT2,320,156,#PROF
 LoadBitMap #BIT2,FileBIT$
 
 ; Vai buscar as Shapes de 64 Cores em AGA ao BitMap
@@ -515,11 +512,24 @@ Goto mainloop
 ; Inicializa o Menu
 .initmenu
 
+; Liberta a Memoria dos BitMaps do Jogo
+  If joytype<>0
+    Free BitMap 0
+    Free BitMap 1
+    Free BitMap #BIT1
+    Free BitMap #BIT4
+  End If
+
+; Cria o BitMap Menu
+  BitMap #BIT3,320,256,#PROF
+
   CreateDisplay #COPPERM
   DisplayPalette #COPPERM,#PAL
 
   Use BitMap #BIT3
   DisplayBitMap #COPPERM,#BIT3
+
+  If joytype=0 Gosub escolhejoystick
 
   Blit #titulo,50,10
 
@@ -529,11 +539,52 @@ Goto mainloop
 
 Return
 
+
+; Escolhe o Tipo de Joystick
+.escolhejoystick
+
+  texto$="   PENISOFT PRESENTS"
+  txtx=54
+  txty=30
+  Gosub imprimetexto
+
+  texto$="     SARDONIC AGA"
+  txtx=58
+  txty=50
+  Gosub imprimetexto
+
+  texto$="    PLEASE SELECT"
+  txtx=62
+  txty=95
+  Gosub imprimetexto
+
+  texto$="1 - ONE BUTTON JOYSTICK"
+  txtx=54
+  txty=120
+  Gosub imprimetexto
+
+  texto$="2 - TWO BUTTON JOYSTICK"
+  txtx=54
+  txty=140
+  Gosub imprimetexto
+
+  texto$="COPYRIGHT 2019 PENISOFT"
+  txtx=54
+  txty=210
+  Gosub imprimetexto
+
+  While joytype=0
+    If RawStatus($1) Then joytype=1
+    If RawStatus($2) Then joytype=2
+  Wend
+
+Return
+
+
 ; Menu - Estado = 0
 .menu
 
   counter=0
-  ccc=0
 
   Boxf 30,30,290,240,0
 
@@ -541,12 +592,9 @@ Return
 
   While Joyb(1)<>1
 
-    ccc+1
+    counter+1
 
-    If ccc=50
-      counter+1
-      ccc=0
-    End If
+    VWait
 
     If counter=#COUNTERMAX
       estado=1
@@ -568,7 +616,6 @@ Return
 .instrucoes
 
   counter=0
-  ccc=0
 
   Boxf 30,30,290,240,0
 
@@ -576,12 +623,9 @@ Return
 
   While Joyb(1)<>1
 
-    ccc+1
+    counter+1
 
-    If ccc=50
-      counter+1
-      ccc=0
-    End If
+    VWait
 
     If counter=#COUNTERMAX
       estado=2
@@ -603,7 +647,6 @@ Return
 .hiscore
 
   counter=0
-  ccc=0
 
   Boxf 30,30,290,240,0
 
@@ -611,12 +654,9 @@ Return
 
   While Joyb(1)<>1
 
-    ccc+1
+    counter+1
 
-    If ccc=50
-      counter+1
-      ccc=0
-    End If
+    VWait
 
     If counter=#COUNTERMAX
       estado=0
@@ -645,10 +685,7 @@ Return
 
   Gosub initmenu
 
-  If pontos>hiscore Then hiscore=pontos
-
   counter=0
-  ccc=0
 
   Boxf 30,30,290,240,0
 
@@ -656,12 +693,15 @@ Return
 
   While counter<#COUNTERMAX
 
-    ccc+1
+    counter+1
 
-    If ccc=50
-      counter+1
-      ccc=0
+    VWait
+
+    If RawStatus($44)
+      estado=0
+      Return
     End If
+
 
   Wend
 
@@ -681,7 +721,6 @@ Return
   If pontos>hiscore Then hiscore=pontos
 
   counter=0
-  ccc=0
 
   Boxf 30,30,290,240,0
 
@@ -689,28 +728,11 @@ Return
 
   While counter<#COUNTERMAX
 
-    ccc+1
+    counter+1
 
-    If ccc=50
-      counter+1
-      ccc=0
-    End If
+    VWait
 
-  Wend
-
-  counter=0
-  ccc=0
-
-  While Joyb(1)<>1
-
-    ccc+1
-
-    If ccc=50
-      counter+1
-      ccc=0
-    End If
-
-    If counter=#COUNTERMAX
+    If RawStatus($44)
       estado=0
       Return
     End If
@@ -723,6 +745,18 @@ Return
 ; Jogo: GetReady - Estado = 3
 .inicializar
 
+; Liberta a Memoria do BitMap Menu
+  Free BitMap #BIT3
+
+; Cria os BitMaps do Jogo
+  BIT0=0
+  BitMap BIT0,320,312,#BITPLANES   ; BitMap Foreground - Double Buffer 0
+  BitMap BIT0+1,320,312,#BITPLANES ; BitMap Foreground - Double Buffer 1
+
+  BitMap #BIT1,320,528,#BITPLANES ; BitMap Background
+
+  BitMap #BIT4,320,16,#PROF      ; BitMap Painel
+
   BlitzKeys On
 
   StopModule
@@ -731,8 +765,7 @@ Return
   AGAPalRGB #PAL,#CORNV1,#RGBNV11,#RGBNV12,#RGBNV13
   AGAPalRGB #PAL,#CORNV2,#RGBNV21,#RGBNV22,#RGBNV23
 
-; Cria os Displays
-  CreateDisplay #COPPERJ,#COPPERP
+; Cria as Palettes
   DisplayPalette #COPPERJ,#PAL
   DisplayPalette #COPPERP,#PAL
 
@@ -744,8 +777,9 @@ Return
   nvcnt=0
   nvmc=0
 
-  bcky=0
+  bcky=264
   bckc=1
+  sat=1
 
   vidas=5
   pontos=0
@@ -756,7 +790,7 @@ Return
   tipo=0
   tipot=0
   inixi=0
-  inixir=Rnd(4)
+  inixir=Int(Rnd(4))
   inimigos=0
   disparosini=0
   premios=0
@@ -781,6 +815,14 @@ Return
 
   counter=-1
   estado=4
+  factor=0
+
+  inicount=100
+
+  tirocount=#RATETIRO
+
+  tiroinirate=#RATETIROINIPM
+  tiroinicount=tiroinirate
 
 ; Desenha o Painel
   Gosub imprimepainel
@@ -791,12 +833,11 @@ Return
 
 ; Desenha o StarField
   For n=0 To 200
-    px=Rnd(239)
-    py=Rnd(255)
-    pc=Rnd(#CORMAX)
+    px=Int(Rnd(240))
+    py=Int(Rnd(264))
+    pc=Int(Rnd(#CORMAX))+16
     Plot px+40,py,pc
-    Plot Rnd(239)+40,Rnd(255)+255,Rnd(#CORMAX)
-    Plot px+40,py+512,pc
+    Plot px+40,py+264,pc
   Next n
 
   BIT0=1
@@ -806,6 +847,9 @@ Return
   BIT0=0
   Use BitMap BIT0
   Cls
+
+; Cria os Displays
+  CreateDisplay #COPPERJ,#COPPERP
 
 Return
 
@@ -824,11 +868,11 @@ Return
 
     If inimigos>0 Gosub moveinimigo
 
-    If inimigos>0 AND tiroinicount=0 Gosub criadisparoini
-
     If disparosini>0 Gosub movedisparoinimigo
 
     If premios>0 Gosub movepremio
+
+    If explos>0 Gosub moveexplosao
 
     If disparos>0 AND inimigos>0 Gosub verificacolisao1
 
@@ -848,9 +892,6 @@ Return
 
     Gosub movenave
 
-    If explos>0 Gosub moveexplosao
-    If explos>0 Gosub blitexplosao
-
     BIT0=1-BIT0 ; Muda de Bitmap Double Buffer
 
     If RawStatus($45) estado=6  ; Verifica se o ESC foi premido
@@ -866,27 +907,28 @@ Return
   DisplayBitMap #COPPERJ,BIT0,15.5,48,#BIT1,15.5,bcky
 
   bcky-bckc
-  bcky=QWrap(bcky,0,512)
+  bcky=QWrap(bcky,0,264)
 
-  If bcky=511 ; Cria um Planeta no 2 ecran
+  If bcky=263 ; Cria um Saturno ou um Planeta no 1o ecran
+
     UnBuffer 0
-    Use BitMap #BIT1
-    BBlit 0,#planeta,Rnd(215)+40,384;Rnd(231)+256
-    AGAPalRGB #PAL,#CORPLANETA,Rnd(#RGBMAX),Rnd(#RGBMED),Rnd(#RGBMAX)
-    DisplayPalette #COPPERJ,#PAL
-    Use BitMap BIT0
-  End If
+    sat=1-sat
 
-  If bcky=256 ; Cria um Saturno nos 1o e 3o ecrans
-    UnBuffer 1
     Use BitMap #BIT1
     px=Rnd(211)+40
-    py=128
-    BBlit 1,#saturno,px,py
-    BBlit 1,#saturno,px,py+512
-    AGAPalRGB #PAL,#CORSATURNO,Rnd(#RGBMAX),Rnd(#RGBMED),Rnd(#RGBMAX)
+    py=240
+
+    If sat=1
+      BBlit 0,#saturno,px,py
+      AGAPalRGB #PAL,#CORSATURNO,Rnd(#RGBMAX),Rnd(#RGBMED),Rnd(#RGBMAX)
+    Else
+      BBlit 0,#planeta,px,py
+      AGAPalRGB #PAL,#CORPLANETA,Rnd(#RGBMAX),Rnd(#RGBMED),Rnd(#RGBMAX)
+    End If
+
     DisplayPalette #COPPERJ,#PAL
     Use BitMap BIT0
+
   End If
 
 Return
@@ -938,7 +980,8 @@ Return
 
   End If
 
-  If Joyb(1)=2 AND bombas>0 AND ratebomba=0 Gosub criabomba
+  If joytype=1 AND RawStatus($40) AND bombas>0 AND ratebomba=0 Gosub criabomba
+  If joytype=2 AND Joyb(1)=2 AND bombas>0 AND ratebomba=0 Gosub criabomba
 
 Return
 
@@ -951,7 +994,7 @@ Return
     ltiro()\x=ptx
     ltiro()\y=pty
 
-    tirocount=25
+    tirocount=#RATETIRO
     disparos+1
 
   End If
@@ -984,7 +1027,7 @@ Return
 
     lini()\tipo=tipo
 
-    lini()\x=inixi;Rnd(239-ltini(tipo)\tx)+40
+    lini()\x=inixi
     lini()\y=ltini(tipo)\py
 
     lini()\tx=ltini(tipo)\tx
@@ -994,7 +1037,7 @@ Return
     lini()\pontos=ltini(tipo)\pontos
 
     inimigos+1
-    inicount=30
+    inicount=#RATEINI
 
   End If
 
@@ -1006,6 +1049,10 @@ Return
   ResetList lini()
 
   While NextItem(lini())
+
+    tipo=lini()\tipo
+
+    If tipo<>3 AND tiroinicount=0 Gosub criadisparoini
 
     If lini()\tipo<5      ; Inimigos
 
@@ -1043,70 +1090,69 @@ Return
 ; Prepara a Criacao do Disparo Inimigo
 .criadisparoini
 
-  ResetList lini()
+  factor=Int(Rnd(50))
 
-  While NextItem(lini())
+  If factor>5
+    tiroinicount=tirorateini
+    Return
+  EndIf
 
-    tipo=lini()\tipo
+  Select tipo
 
-    Select tipo
+    Case 1
+      ptix=lini()\x+11
+      ptiy=lini()\y+16
+      Gosub criadisparoinimigo
 
-      Case 1
-        ptix=lini()\x+11
-        ptiy=lini()\y+16
+    Case 2
+      ptix=lini()\x+7
+      ptiy=lini()\y+16
+      Gosub criadisparoinimigo
+      ptix=lini()\x+15
+      ptiy=lini()\y+16
+      Gosub criadisparoinimigo
+
+    Case 4
+      ptix=lini()\x+12
+      ptiy=lini()\y+24
+      Gosub criadisparoinimigo
+
+    Case 5
+      For t=0 To 3
+        ptix=lini()\x+t*15
+        ptiy=lini()\y+lini()\ty
         Gosub criadisparoinimigo
+      Next t
 
-      Case 2
-        ptix=lini()\x+7
-        ptiy=lini()\y+16
+    Case 6
+      For t=0 To 3
+        ptix=lini()\x+t*15
+        ptiy=lini()\y+lini()\ty
         Gosub criadisparoinimigo
-        ptix=lini()\x+15
-        ptiy=lini()\y+16
+      Next t
+
+    Case 7
+      For t=0 To 3
+        ptix=lini()\x+t*7
+        ptiy=lini()\y+lini()\ty
         Gosub criadisparoinimigo
+      Next t
 
-      Case 4
-        ptix=lini()\x+12
-        ptiy=lini()\y+24
+    Case 8
+      For t=0 To 5
+        ptix=lini()\x+t*8
+        ptiy=lini()\y+lini()\ty
         Gosub criadisparoinimigo
+      Next t
 
-      Case 5
-        For t=0 To 3
-          ptix=lini()\x+t*15
-          ptiy=lini()\y+lini()\ty
-          Gosub criadisparoinimigo
-        Next t
+    Case 9
+      For t=0 To 7
+        ptix=lini()\x+t*10
+        ptiy=lini()\y+lini()\ty
+        Gosub criadisparoinimigo
+      Next t
 
-      Case 6
-        For t=0 To 3
-          ptix=lini()\x+t*15
-          ptiy=lini()\y+lini()\ty
-          Gosub criadisparoinimigo
-        Next t
-
-      Case 7
-        For t=0 To 3
-          ptix=lini()\x+t*7
-          ptiy=lini()\y+lini()\ty
-          Gosub criadisparoinimigo
-        Next t
-
-      Case 8
-        For t=0 To 5
-          ptix=lini()\x+t*8
-          ptiy=lini()\y+lini()\ty
-          Gosub criadisparoinimigo
-        Next t
-
-      Case 9
-        For t=0 To 7
-          ptix=lini()\x+t*10
-          ptiy=lini()\y+lini()\ty
-          Gosub criadisparoinimigo
-        Next t
-
-    End Select
-
-  Wend
+  End Select
 
 Return
 
@@ -1152,9 +1198,13 @@ Return
 
     lpremio()\x=ptix
     lpremio()\y=ptiy
-    lpremio()\cnt=0
+    lpremio()\cnt=#PRMTEMPO
     lpremio()\tmp=2
-    lpremio()\tipo=Rnd(4)+1
+    lpremio()\tipo=Int(Rnd(4))+1
+
+    If lpremio()\tipo=1 AND vidas=#MAXVIDAS Then lpremio()\tipo=4
+    If lpremio()\tipo=2 AND nvtiros=1 Then lpremio()\tipo=4
+    If lpremio()\tipo=3 AND bombas=#MAXBOMBAS Then lpremio()\tipo=4
 
     getpremio=0
     premios+1
@@ -1176,9 +1226,9 @@ Return
 
       lpremio()\tmp=2
       lpremio()\y+1
-      lpremio()\cnt+1
+      lpremio()\cnt-1
 
-      If lpremio()\y>286 OR lpremio()\cnt=75
+      If lpremio()\y>286 OR lpremio()\cnt=0
         KillItem lpremio()
         premios-1
       End If
@@ -1196,8 +1246,9 @@ Return
   If AddItem(lexplo())
 
     lexplo()\x=ptix
-    lexplo()\y=ptiy+bcky-48
-    lexplo()\cnt=10
+    lexplo()\y=ptiy
+    lexplo()\cnt=5
+    lexplo()\fase=0
 
     explos+1
     Sound #fxexplo,2
@@ -1214,16 +1265,19 @@ Return
   While NextItem(lexplo())
 
     lexplo()\cnt-1
-    lexplo()\y-1
 
     If lexplo()\cnt=0
+      lexplo()\fase+1
+      lexplo()\cnt=5
+    End If
+
+   If lexplo()\fase=4
       KillItem lexplo()
       explos-1
     End If
 
-  Wend
 
-  If explos=0 UnBuffer 2
+  Wend
 
 Return
 
@@ -1318,9 +1372,9 @@ Return
   For n=0 To 3
     If AddItem(lexplo())
       lexplo()\x=gex(n)
-      lexplo()\y=gey(n)+bcky-48
-      lexplo()\cnt=20
-
+      lexplo()\y=gey(n)
+      lexplo()\cnt=10
+      lexplo()\fase=0
       explos+1
     End If
   Next n
@@ -1348,7 +1402,17 @@ Return
 
         lini()\hull-1
 
-        If lini()\tipo>4 AND lini()\hull>0 Sound #fxexplo,2
+        If lini()\tipo>4 AND lini()\hull>0 ; Se for um Boss e ainda estiver vivo
+          Sound #fxexplo,2
+
+          ptix=ltiro()\x    ; Cria Explosao
+          ptiy=ltiro()\y
+          Gosub criaexplosao
+
+          pontos+5
+          Gosub atualizapontos
+      End If
+
 
         If lini()\hull=0 ; Verifica se e altura de terminar o Inimigo
 
@@ -1421,7 +1485,7 @@ Return
       If nvinven=0 ; Verifica a Invencibilidade da Nave
         nvinven=1
         nvmc=1
-        nvcnt=100
+        nvcnt=#ARMOUR
         vidas-1
         nvtiros=0
         Gosub atualizavidas
@@ -1492,7 +1556,7 @@ Return
       If nvinven=0 ; Verifica a Invencibilidade da Nave
         nvinven=1
         nvmc=1
-        nvcnt=100
+        nvcnt=#ARMOUR
         nvtiros=0
         vidas-1
         Gosub atualizavidas
@@ -1516,14 +1580,14 @@ Return
 
       Select lpremio()\tipo
         Case 1
-          If vidas<5 vidas+1
+          If vidas<#MAXVIDAS vidas+1
           Gosub atualizavidas
           Sound #fxprvidas,8
         Case 2
           nvtiros=1
           Sound #fxprtiros,8
         Case 3
-          If bombas<5 bombas+1
+          If bombas<#MAXBOMBAS bombas+1
           Gosub atualizabombas
           Sound #fxprbombas,8
         Case 4
@@ -1546,7 +1610,7 @@ Return
 .criabomba
 
   bombas-1
-  ratebomba=50
+  ratebomba=#TEMPOBOMBA
   Gosub atualizabombas
 
   ClearList ltiro()    ; Apaga todos os Disparos
@@ -1640,22 +1704,13 @@ Return
     QBlit BIT0,lpremio()\tipo+11,lpremio()\x,lpremio()\y
   Wend
 
-Return
-
-; Imprime as Explosoes no BitMap Respetivo - Background
-.blitexplosao
-
-  UnBuffer 2 ; Apaga as Explosoes Atuais no Buffer Respetivo
-
-  Use BitMap #BIT1 ; Seleciona o BitMap Respetivo - Background
-
-  ResetList lexplo()
+; Explosoes
+ ResetList lexplo()
   While NextItem(lexplo())
-    BBlit 2,#explosao,lexplo()\x,lexplo()\y
+    QBlit BIT0,lexplo()\fase+#explosao1,lexplo()\x,lexplo()\y
   Wend
 
 Return
-
 
 ; Imprime Textos no Ecran
 .imprimetexto
@@ -1674,39 +1729,51 @@ Return
   txty=50
   Gosub imprimetexto
 
-  texto$="FIRE 1 : FIRE"
-  txtx=86
-  txty=60
-  Gosub imprimetexto
+  If joytype=1
+    texto$=" FIRE BUTTON : FIRE"
+    txtx=56
+    txty=65
+    Gosub imprimetexto
 
-  texto$="FIRE 2 : BOMB"
-  txtx=86
-  txty=70
-  Gosub imprimetexto
+    texto$="    SPACE : BOMB"
+    txtx=56
+    txty=80
+    Gosub imprimetexto
+  Else
+    texto$="FIRE 1 : FIRE"
+    txtx=86
+    txty=65
+    Gosub imprimetexto
+
+    texto$="FIRE 2 : BOMB"
+    txtx=86
+    txty=80
+    Gosub imprimetexto
+  End If
 
   texto$="FIRE TO START GAME"
   txtx=64
-  txty=110
+  txty=120
   Gosub imprimetexto
 
   texto$="ESCAPE TO EXIT"
   txtx=80
-  txty=120
+  txty=135
   Gosub imprimetexto
 
   texto$="CODE AND GRAPHICS : MADAXE"
   txtx=38
-  txty=160
+  txty=175
   Gosub imprimetexto
 
   texto$="MUSIC : MOD SYNTH BY FRED"
   txtx=42
-  txty=170
+  txty=190
   Gosub imprimetexto
 
   texto$="COPYRIGHT 2019 PENISOFT"
   txtx=50
-  txty=210
+  txty=230
   Gosub imprimetexto
 
 Return
@@ -1786,8 +1853,35 @@ Return
 
   texto$="GAME OVER !!"
   txtx=90
-  txty=110
+  txty=80
   Gosub imprimetexto
+
+  If pontos>hiscore
+    hiscore=pontos
+    texto$="  BUT YOU ACHIEVED"
+    txtx=60
+    txty=130
+    Gosub imprimetexto
+    texto$="  AN HISCORE YES!!"
+    txtx=60
+    txty=150
+    Gosub imprimetexto
+  Else
+    texto$="NO HISCORE ACHIEVED"
+    txtx=60
+    txty=130
+    Gosub imprimetexto
+    texto$="  MAYBE NEXT TIME"
+    txtx=60
+    txty=150
+    Gosub imprimetexto
+  End If
+
+  texto$="PRESS RETURN TO MAIN MENU"
+  txtx=40
+  txty=220
+  Gosub imprimetexto
+
 
 Return
 
@@ -1796,28 +1890,41 @@ Return
 
   texto$="WELL DONE !!"
   txtx=90
-  txty=80
+  txty=60
+  Gosub imprimetexto
+
+  texto$="YOU DEFEATED THE EVIL"
+  txtx=50
+  txty=90
+  Gosub imprimetexto
+  texto$="SARDONIC AND ITS ARMY"
+  txtx=50
+  txty=100
   Gosub imprimetexto
 
   texto$="THANK YOU FOR PLAYING"
   txtx=50
-  txty=110
+  txty=130
   Gosub imprimetexto
-
   texto$="   THIS LITTE GAME"
   txtx=50
-  txty=120
+  txty=140
   Gosub imprimetexto
 
   texto$="   SEE YOU SOON ON"
   txtx=50
-  txty=150
+  txty=170
   Gosub imprimetexto
-
   texto$="   ATARI ST VERSION"
   txtx=46
-  txty=160
+  txty=180
   Gosub imprimetexto
+
+  texto$="PRESS RETURN TO MAIN MENU"
+  txtx=40
+  txty=220
+  Gosub imprimetexto
+
 
 Return
 
@@ -1930,14 +2037,14 @@ Return
 
       If tipo>0 Gosub criainimigo
 
-      inicount=20
+      inicount=#RATEINI
 
       If tipo>4
         estado=5
-        tiroinirate=25
+        tiroinirate=#RATETIROINIBS
         bckc=2
       Else
-        tiroinirate=50
+        tiroinirate=#RATETIROINIPM
         bckc=1
       End If
 
