@@ -133,6 +133,10 @@
 #define KB_SPACE 57
 #define KB_LFT_ALT 56
 #define KB_RETURN 28
+#define KB_UP 72
+#define KB_DOWN 80
+#define KB_LEFT 75
+#define KB_RIGHT 77
 
 /* Teclado - kbhit */
 #define KB_0 48
@@ -144,7 +148,8 @@
 /* My Prototypes */
 void openscreen(void);
 void closescreen(void);
-void setup(void);
+void setupsom(void);
+void setupkey(void);
 
 int inicializa(void);
 void mainloop(void);
@@ -481,6 +486,7 @@ unsigned char hi,lo;
 /* Teclado */
 unsigned char teclas[0x60];
 int KB_code=0;
+int inputtype=0;
 
 /* Ficheiros */
 FILE *fp;
@@ -675,7 +681,8 @@ int main(int argc, char *argv[])
 		unlives=1;
 	}
 
-	setup();
+	setupsom();
+	setupkey();
 	
 	if (inicializa()!=0)
 		return(1);
@@ -733,7 +740,7 @@ void closescreen(void)
 }
 
 /* Sound Card Setup */
-void setup(void)
+void setupsom(void)
 {
 	
 	int setsts;
@@ -782,6 +789,60 @@ void setup(void)
 	while(!setsts);
 	
 	cardtype=KB_code-48;
+	
+	/* Text Mode */	
+	asm{
+		mov ax,regtxt
+		int 0x10
+	}
+	
+}
+
+/* Keyboard Setup */
+void setupkey(void)
+{
+	
+	int setsts;
+
+	/* Text Mode */	
+	asm{
+		mov ax,regtxt
+		int 0x10
+	}
+	
+	_setcursortype(_NOCURSOR);
+
+	textcolor(4);
+	gotoxy(22,2);cprintf("----------------------------------");
+	textcolor(15);
+	gotoxy(22,3);cprintf("Penisoft Presents: SARDONIC MS-DOS");
+	textcolor(4);
+	gotoxy(22,4);cprintf("----------------------------------");
+	
+	textcolor(14);
+	gotoxy(22,7);cprintf("Please Select your Control Scheme:");
+	
+	textcolor(11);
+	gotoxy(27,10);cprintf("0 - CURSORS - Directions");
+	gotoxy(27,11);cprintf("    Space - Fire");
+	gotoxy(27,12);cprintf("    Left ALT - Bomb");
+	
+	gotoxy(27,16);cprintf("1 - Q A O P - Directions");
+	gotoxy(27,17);cprintf("    Space - Fire");
+	gotoxy(27,18);cprintf("    Left ALT - Bomb");
+	
+	textcolor(15);
+	gotoxy(28,24);cprintf("Copyright 2020 Penisoft");
+	
+	setsts=0;
+	do
+	{
+		KB_code=getch();
+		if (KB_code>=KB_0 && KB_code<=KB_1) setsts=1;
+	}
+	while(!setsts);
+	
+	inputtype=KB_code-48;
 	
 	/* Text Mode */	
 	asm{
@@ -897,7 +958,10 @@ void mainmenu()
 	
 	time1=time(NULL);
 	
-	printtxt(80,36,TXTX,TYTX,"Q A O P - DIRECTIONS\0");
+	if (!inputtype)
+		printtxt(80,36,TXTX,TYTX,"CURSORS - DIRECTIONS\0");
+	else
+		printtxt(80,36,TXTX,TYTX,"Q A O P - DIRECTIONS\0");
 	printtxt(112,52,TXTX,TYTX,"SPACE - FIRE\0");
 	printtxt(100,68,TXTX,TYTX,"LEFT ALT - BOMB\0");
 			
@@ -1484,23 +1548,44 @@ void clearscreen(unsigned char databuf[])
 /* Movimenta a Nave */
 void movenave()
 {
-
-	/* Cima */
-	if(teclas[KB_Q])
-		if (ny>=nspeed) ny-=nspeed;
-
-	/* Baixo */
-	if(teclas[KB_A])
-		if (ny<=MAXY-(nty+nspeed)) ny+=nspeed;
-
-	/* Esquerda */
-	if(teclas[KB_O])
-		if (nx>=nspeed) nx-=nspeed;
-
-	/* Direita */
-	if(teclas[KB_P])
-		if (nx<=MAXX-(ntx+nspeed)) nx+=nspeed;
 	
+	if (!inputtype) /* Keyboard : CURSORS - Directions */
+	{
+		/* Cima */
+		if(teclas[KB_UP])
+			if (ny>=nspeed) ny-=nspeed;
+
+		/* Baixo */
+		if(teclas[KB_DOWN])
+			if (ny<=MAXY-(nty+nspeed)) ny+=nspeed;
+
+		/* Esquerda */
+		if(teclas[KB_LEFT])
+			if (nx>=nspeed) nx-=nspeed;
+
+		/* Direita */
+		if(teclas[KB_RIGHT])
+			if (nx<=MAXX-(ntx+nspeed)) nx+=nspeed;	
+	}
+	else /* Keyboard : Q A O P - Directions */
+	{
+		/* Cima */
+		if(teclas[KB_Q])
+			if (ny>=nspeed) ny-=nspeed;
+
+		/* Baixo */
+		if(teclas[KB_A])
+			if (ny<=MAXY-(nty+nspeed)) ny+=nspeed;
+
+		/* Esquerda */
+		if(teclas[KB_O])
+			if (nx>=nspeed) nx-=nspeed;
+
+		/* Direita */
+		if(teclas[KB_P])
+			if (nx<=MAXX-(ntx+nspeed)) nx+=nspeed;
+	}
+
 	/* Disparo */
 	if(teclas[KB_SPACE])
 		if (ratetiro==0)
@@ -1524,11 +1609,13 @@ int colrect(int xi1,int yi1,int xf1,int yf1,int xi2,int yi2,int xf2,int yf2)
 					else return(1);
 				
 	return (0);
+	
 }
 
 /* Verifica Colisão entre os Disparos e os Inimigos */
 void verificacolisao1(void)
 {
+	
 	int t,i,c;
 	int ex,ey;
 
@@ -4359,7 +4446,7 @@ static void interrupt keyb_int(void)
 		teclas[tcode-0x80]=0;
 	else
 		teclas[tcode]=1;
-	
+
 }
 
 void hook_keyb_int(void)
