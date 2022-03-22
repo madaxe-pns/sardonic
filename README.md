@@ -7,7 +7,7 @@ Music by Frédéric Hahn.
 
 Linux port by Thorsten Otto
 
-More info: http://sardonic.planetaclix.pt
+More info: https://madaxe-pns.github.io/sardonic/
 
 ### Amiga
 Commodore Amiga OCS/ECS and AGA sources.
